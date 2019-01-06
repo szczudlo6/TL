@@ -25,6 +25,7 @@ extern int BarsLimit = 200;
 extern int TrendLinesNum = 5;
    
 extern double PriceDeviation = 50;
+extern double TrailingStop = 300;
 
 int OpenedOrders=0;
 int MaxOpenPosition = 1;
@@ -43,7 +44,7 @@ int OnInit()
    initTimeCandle(CandleNumber);
    initOrder (MoneyRisk,MaxOpenPosition);   
    
-   ReinitFile();
+   ReinitFile(OrderFileName);
    //get open position
    CheckOpenPosition=GetOpenOrder();
    
@@ -79,7 +80,7 @@ void OnTick()
    else if (OpenedOrders>0)
       CheckCurrentOrders();
 }
-  
+
 void CheckCurrentOrders()
 {  
    int magicnumber=0;
@@ -93,11 +94,12 @@ void CheckCurrentOrders()
          if(CheckMagicNumber(magicnumber))
          {
             b=true;
+            Trailing(magicnumber,TrailingStop);
             if(CheckPriceIsInTrendLine(magicnumber,OrderType(),OrderOpenPrice()))
                if(CloseOrderByMagicNumber(magicnumber))
                {
                   OpenedOrders--;
-                  ReinitFile();
+                  ReinitFile(OrderFileName);
                }
          } 
       }

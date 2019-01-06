@@ -61,26 +61,26 @@ bool OpenOrder(int OpenedOrder, int order, double lotsize, double stoploss,doubl
       if (order == 1)
       {  
          if (takeprofit!=0) takeprofit = Bid - (takeprofit* Point);
-         if(OrderSend(Symbol(),order,lotsize,Bid,3,Bid+(stoploss*Point),takeprofit,NULL,_magicnumber,0,clrGreen))         
-            {
-               SetArrayOrderList(_magicnumber);
-               Print("Short transaction opened");
-               return (true);  
-            }     
-         else
-            Print("Cannot open short transaction.");
+            if(OrderSend(Symbol(),order,lotsize,Bid,3,NormalizeDouble(Bid+(stoploss*Point),Digits),takeprofit,NULL,_magicnumber,0,clrGreen))         
+               {
+                  SetArrayOrderList(_magicnumber);
+                  Print("Short transaction opened");
+                  return (true);  
+               }     
+            else
+               Print("Cannot open short transaction.");
       }
       else if (order == 0)
       {  
          if (takeprofit!=0) takeprofit = Ask + (takeprofit * Point);
-         if(OrderSend(Symbol(),order,lotsize,Ask,3,Ask - (stoploss * Point) ,takeprofit,NULL,_magicnumber,0,clrGreen))
-            {
-               SetArrayOrderList(_magicnumber);
-               Print("Long transaction opened");  
-               return (true);                  
-            }
-         else
-            Print("Cannot open long transaction.");      
+            if(OrderSend(Symbol(),order,lotsize,Ask,3,NormalizeDouble(Ask - (stoploss * Point),Digits) ,takeprofit,NULL,_magicnumber,0,clrGreen))
+               {
+                  SetArrayOrderList(_magicnumber);
+                  Print("Long transaction opened");  
+                  return (true);                  
+               }
+            else
+               Print("Cannot open long transaction.");      
       }
    }
    return (false);
@@ -116,5 +116,21 @@ bool CheckMagicNumber(int _magicNumber) export
    return(false);
 }
 
-
+void Trailing(int _magicnumber, double _trailingstop) export
+{
+   if(_trailingstop>0)
+      for(int i=OrdersTotal()-1; i >= 0 ;i--)
+      {
+         if(OrderSelect(i,SELECT_BY_POS,MODE_TRADES))
+            if(OrderMagicNumber() == _magicnumber)
+               if(OrderType()==OP_BUY) 
+                  if(Bid-OrderOpenPrice()>Point*_trailingstop)
+                     if(!OrderModify(OrderTicket(),OrderOpenPrice(),NormalizeDouble(Bid-(Point * _trailingstop),Digits),OrderTakeProfit(),0))
+                        Print("Error in OrderModify. Error code=",GetLastError()); 
+               else if(OrderType()==OP_SELL) 
+                  if(Ask-OrderOpenPrice()<Point*_trailingstop)
+                     if(!OrderModify(OrderTicket(),OrderOpenPrice(),NormalizeDouble(Ask+(Point * _trailingstop),Digits),OrderTakeProfit(),0))
+                        Print("Error in OrderModify. Error code=",GetLastError()); 
+       }
+}
   

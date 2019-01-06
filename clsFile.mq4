@@ -21,8 +21,9 @@ void initFile(string _filename) export
    FileName =_filename;
 }
 
-void ReinitFile() export
+void ReinitFile(string OrderFileName) export
 { 
+   initFile(OrderFileName);
    if(Read1DimensionArrayFromFile(arrFromFile))
       if(!CompareCurrentOrderToFile())
          FileDelete(FileName);         

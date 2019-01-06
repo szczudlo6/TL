@@ -10,7 +10,6 @@
 #property strict
 
 #include <clsStruct.mqh>
-
 string CreateMagicNumber() export
 {
    datetime ct = TimeCurrent();
