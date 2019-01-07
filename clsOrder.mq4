@@ -122,15 +122,17 @@ void Trailing(int _magicnumber, double _trailingstop) export
       for(int i=OrdersTotal()-1; i >= 0 ;i--)
       {
          if(OrderSelect(i,SELECT_BY_POS,MODE_TRADES))
-            if(OrderMagicNumber() == _magicnumber)
+            if(OrderMagicNumber() == _magicnumber) 
                if(OrderType()==OP_BUY) 
                   if(Bid-OrderOpenPrice()>Point*_trailingstop)
-                     if(!OrderModify(OrderTicket(),OrderOpenPrice(),NormalizeDouble(Bid-(Point * _trailingstop),Digits),OrderTakeProfit(),0))
-                        Print("Error in OrderModify. Error code=",GetLastError()); 
+                     if(OrderStopLoss()<Bid-(Point*_trailingstop)) 
+                        if(!OrderModify(OrderTicket(),OrderOpenPrice(),NormalizeDouble(Bid-(Point * _trailingstop),Digits),OrderTakeProfit(),0))
+                           Print("Error in OrderModify. Error code=",GetLastError()); 
                else if(OrderType()==OP_SELL) 
                   if(Ask-OrderOpenPrice()<Point*_trailingstop)
-                     if(!OrderModify(OrderTicket(),OrderOpenPrice(),NormalizeDouble(Ask+(Point * _trailingstop),Digits),OrderTakeProfit(),0))
-                        Print("Error in OrderModify. Error code=",GetLastError()); 
+                     if(OrderStopLoss()>Ask+(Point*_trailingstop))
+                        if(!OrderModify(OrderTicket(),OrderOpenPrice(),NormalizeDouble(Ask+(Point * _trailingstop),Digits),OrderTakeProfit(),0))
+                           Print("Error in OrderModify. Error code=",GetLastError()); 
        }
 }
   
